@@ -57,8 +57,8 @@ void startup(int argc, char* argv[]) {
     rendering_program = create_shaders();
     create_vao();
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
 }
 
 void check_gl_error(GLenum error_code, const char* custom_msg) {
@@ -108,15 +108,16 @@ void window_resize_func(int w, int h) {
 	window_width = w;
 	window_height = h;
 	glViewport(0, 0, window_width, window_height);
+	glutPostRedisplay();
 }
 
 void window_render_func(void) {
 	++frame_count;
 
-	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const GLfloat bg_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    glClearBufferfv(GL_COLOR, 0, bg_color);
+    // const GLfloat bg_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    // glClearBufferfv(GL_COLOR, 0, bg_color);
 
 	glUseProgram(rendering_program);
 
@@ -125,18 +126,19 @@ void window_render_func(void) {
 
 	glVertexAttrib4fv(0, attrib);
 	glVertexAttrib4fv(1, color);
-	glPointSize(5.0f);
+	// glPointSize(5.0f);
 
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	// glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDrawArrays(GL_PATCHES, 0, 3);
+	// glDrawArrays(GL_PATCHES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glutSwapBuffers();
 }
 
 void idle_func(void) {
-	glutPostRedisplay();
+	// glutPostRedisplay();
 }
 
 void timer_func(int n) {
@@ -174,13 +176,20 @@ GLuint create_shaders(void) {
 	    // "out VS_OUT {\n"
 	    // "	vec4 color;\n"
 	    // "} vs_out;\n"
+	    "out vec4 vs_color;\n"
 	    "void main(void) {\n"
 	    "	const vec4 vertices[3] = vec4[3](\n"
 	    "		vec4(-0.25, -0.25, 0.5, 1.0),\n"
 	    "		vec4(0.25, -0.25, 0.5, 1.0),\n"
 	    "		vec4(0.25, 0.25, 0.5, 1.0)\n"
 	    "	);\n"
+	    "	const vec4 colors[] = vec4[3](\n"
+	    "		vec4(1.0, 0.0, 0.0, 1.0),\n"
+	    "		vec4(0.0, 1.0, 0.0, 1.0),\n"
+	    "		vec4(0.0, 0.0, 1.0, 1.0)\n"
+	    "	);\n"
 	    "   gl_Position=vertices[gl_VertexID] + offset;\n"
+	    "	vs_color = colors[gl_VertexID];\n"
 	    // "	vs_out.color = color;\n"
 	    "}\n"
 	};
@@ -237,10 +246,15 @@ GLuint create_shaders(void) {
 	    // "in VS_OUT {\n"
 	    // "	vec4 color;\n"
 	    // "} fs_in;\n"
+	    "in vec4 vs_color;\n"
 	    "out vec4 color;\n"
 	    "void main(void) {\n"
-	    "	color = vec4(0.0, 0.8, 1.0, 1.0);\n"
-	    // "   color = fs_in.color;\n"
+	    // "	color = vec4(sin(gl_FragCoord.x * 0.25)*0.5+0.5,\n"
+	    // "		cos(gl_FragCoord.y*0.25)*0.5+0.5,\n"
+	    // "		sin(gl_FragCoord.x*0.15)*cos(gl_FragCoord.y*0.15),\n"
+	    // "		1.0);\n"
+	    // "	color = vec4(0.0, 0.8, 1.0, 1.0);\n"
+	    "   color = vs_color;\n"
 	    "}\n"
 	};
 
@@ -266,8 +280,8 @@ GLuint create_shaders(void) {
 
     program = glCreateProgram();
     glAttachShader(program, vs);
-    glAttachShader(program, tcs);
-    glAttachShader(program, tes);
+    // glAttachShader(program, tcs);
+    // glAttachShader(program, tes);
     // glAttachShader(program, gs);
     glAttachShader(program, fs);
     glLinkProgram(program);
