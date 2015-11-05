@@ -57,6 +57,8 @@ void startup(int argc, char* argv[]) {
     rendering_program = create_shaders();
     create_vao();
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 }
 
 void check_gl_error(GLenum error_code, const char* custom_msg) {
@@ -123,9 +125,11 @@ void window_render_func(void) {
 
 	glVertexAttrib4fv(0, attrib);
 	glVertexAttrib4fv(1, color);
+	glPointSize(5.0f);
+
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDrawArrays(GL_PATCHES, 0, 3);
 
 	glutSwapBuffers();
@@ -159,6 +163,7 @@ GLuint create_shaders(void) {
 	GLuint vs,
 		tcs,
 		tes,
+		gs,
 		fs,
 		program;
 
@@ -171,8 +176,8 @@ GLuint create_shaders(void) {
 	    // "} vs_out;\n"
 	    "void main(void) {\n"
 	    "	const vec4 vertices[3] = vec4[3](\n"
-	    "		vec4(0.25, -0.25, 0.5, 1.0),\n"
 	    "		vec4(-0.25, -0.25, 0.5, 1.0),\n"
+	    "		vec4(0.25, -0.25, 0.5, 1.0),\n"
 	    "		vec4(0.25, 0.25, 0.5, 1.0)\n"
 	    "	);\n"
 	    "   gl_Position=vertices[gl_VertexID] + offset;\n"
@@ -201,7 +206,7 @@ GLuint create_shaders(void) {
 	};
 	const GLchar * tes_src[] = {
 		"#version 450 core\n"
-		"layout (triangles, equal_spacing, cw) in;\n"
+		"layout (triangles, equal_spacing, ccw) in;\n"
 	    // "in TCS_OUT {\n"
 	    // "	vec4 color;\n"
 	    // "} tes_in;\n"
@@ -213,6 +218,18 @@ GLuint create_shaders(void) {
 		"		(gl_TessCoord.y * gl_in[1].gl_Position) +\n"
 		"		(gl_TessCoord.z * gl_in[2].gl_Position);\n"
 		// "	tes_out = tes_in;\n"
+		"}\n"
+	};
+	const GLchar * gs_src[] = {
+		"#version 450 core\n"
+		"layout (triangles) in;\n"
+		"layout (points, max_vertices = 3) out;\n"
+		"void main(void) {\n"
+		"	int i;\n"
+		"	for(i=0; i<gl_in.length(); i++) {\n"
+		"		gl_Position = gl_in[i].gl_Position;\n"
+		"		EmitVertex();\n"
+		"	}\n"
 		"}\n"
 	};
 	const GLchar * fs_src[] = {
@@ -239,6 +256,10 @@ GLuint create_shaders(void) {
     glShaderSource(tes, 1, tes_src, NULL);
     glCompileShader(tes);
 
+    gs = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(gs, 1, gs_src, NULL);
+    glCompileShader(gs);
+
     fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, fs_src, NULL);
     glCompileShader(fs);
@@ -247,12 +268,14 @@ GLuint create_shaders(void) {
     glAttachShader(program, vs);
     glAttachShader(program, tcs);
     glAttachShader(program, tes);
+    // glAttachShader(program, gs);
     glAttachShader(program, fs);
     glLinkProgram(program);
 
     glDeleteShader(vs);
     glDeleteShader(tcs);
     glDeleteShader(tes);
+    glDeleteShader(gs);
     glDeleteShader(fs);
 
     return program;
