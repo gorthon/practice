@@ -7,10 +7,12 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "dobogl.h"
+
 #define WINDOW_TITLE_PREFIX "doboGL"
 
-#define DOBO_ENVIRONMENT_LAPTOP 1
-//define DOBO_ENVIRONMENT_DESKTOP 1
+// #define DOBO_ENVIRONMENT_LAPTOP 1
+#define DOBO_ENVIRONMENT_DESKTOP 1
 
 #ifdef DOBO_ENVIRONMENT_LAPTOP
 #define DOBO_MAJOR_VERSION 4
@@ -50,6 +52,44 @@ void shutdown(void);
 
 
 int main(int argc, char* argv[]) {
+	// GLfloat num;
+	// GLfloat* A = malloc((sizeof num) * 16);
+	// GLfloat* B = malloc((sizeof num) * 16);
+	// GLfloat* C;
+	// int i = 0, j=0;
+	// for(i = 0; i < 4; i++) {
+	// 	for(j = 0; j < 4; j++) {
+	// 		A[i + 4*j] = 4*i + j + 1;
+	// 		B[i + 4*j] = 4*i + j + 17;
+	// 	}
+	// }
+	// C = dglMultiply44f44f(A,B);
+	// for(i = 0; i < 4; i++) {
+	// 	for(j = 0; j < 4; j++) {
+	// 		printf("%f\t", A[i + 4*j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// printf(" times \n");
+	// for(i = 0; i < 4; i++) {
+	// 	for(j = 0; j < 4; j++) {
+	// 		printf("%f\t", B[i + 4*j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// printf(" equals \n");
+	// for(i = 0; i < 4; i++) {
+	// 	for(j = 0; j < 4; j++) {
+	// 		printf("%f\t", C[i + 4*j]);
+	// 	}
+	// 	printf("\n");
+	// }
+
+	// free(A);
+	// free(B);
+	// free(C);
+	return 0;
+
 	startup(argc, argv);
 
 	glutMainLoop();
