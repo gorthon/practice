@@ -8,9 +8,22 @@
 #include <GL/freeglut.h>
 
 #define WINDOW_TITLE_PREFIX "doboGL"
+
+#define DOBO_ENVIRONMENT_LAPTOP 1
+//define DOBO_ENVIRONMENT_DESKTOP 1
+
+#ifdef DOBO_ENVIRONMENT_LAPTOP
 #define DOBO_MAJOR_VERSION 4
 #define DOBO_MINOR_VERSION 5
 #define DOBO_STR_VERSION "450"
+#endif
+#ifdef DOBO_ENVIRONMENT_DESKTOP
+#define DOBO_MAJOR_VERSION 4
+#define DOBO_MINOR_VERSION 5
+#define DOBO_STR_VERSION "450"
+#endif
+
+
 
 int window_width = 600,
 	window_height = 600,
