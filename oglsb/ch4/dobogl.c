@@ -2,45 +2,33 @@
 
 
 void dglAdd3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v1[0]) * 3);
 	res[0] = v1[0] + v2[0];
 	res[1] = v1[1] + v2[1];
 	res[2] = v1[2] + v2[2];
 }
 void dglAdd4f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v1[0]) * 4);
 	res[0] = v1[0] + v2[0];
 	res[1] = v1[1] + v2[1];
 	res[2] = v1[2] + v2[2];
 	res[3] = v1[3] + v2[3];
 }
 void dglSubtract3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v1[0]) * 3);
 	res[0] = v1[0] - v2[0];
 	res[1] = v1[1] - v2[1];
 	res[2] = v1[2] - v2[2];
 }
 void dglSubtract4f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v1[0]) * 4);
 	res[0] = v1[0] - v2[0];
 	res[1] = v1[1] - v2[1];
 	res[2] = v1[2] - v2[2];
 	res[3] = v1[3] - v2[3];
 }
 void dglScalar3f(GLfloat a, GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v[0]) * 3);
 	res[0] = a * v[0];
 	res[1] = a * v[1];
 	res[2] = a * v[2];
 }
 void dglScalar4f(GLfloat a, GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v[0]) * 4);
 	res[0] = a * v[0];
 	res[1] = a * v[1];
 	res[2] = a * v[2];
@@ -52,7 +40,17 @@ GLfloat dglDot3f(GLfloat* v1, GLfloat* v2) {
 GLfloat dglDot4f(GLfloat* v1, GLfloat* v2) {
 	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3];
 }
-// void dglCross3f(GLfloat* v1, GLfloat* v2) {}
+GLfloat dglMagnitude3f(GLfloat* vec) {
+	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+}
+GLfloat dglMagnitude4f(GLfloat* vec) {
+	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+}
+void dglCross3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
+	res[0] = v1[1]*v2[2] - v1[2]*v2[1];
+	res[1] = v1[0]*v2[2] - v1[2]*v2[0];
+	res[3] = v1[0]*v2[1] - v1[1]*v2[0];
+}
 // void dglCross4f(GLfloat* v1, GLfloat* v2) {}
 
 // GLfloat dglDeterminant44f(GLfloat* A) {}
@@ -67,39 +65,17 @@ GLfloat dglDeterminant22f(GLfloat* A) {
 // GLfloat dgl4f(GLfloat* v1, GLfloat* v2) {}
 
 void dglNormalize3f(GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v[0]) * 3);
 	dglScalar3f(1/dglMagnitude3f(v), v, res);
 }
 void dglNormalize4f(GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof v[0]) * 4);
 	dglScalar4f(1/dglMagnitude4f(v), v, res);
 }
 
 GLfloat dglGetRadians3f(GLfloat* v1, GLfloat* v2) {
-	GLfloat *nv1, *nv2;
-	GLfloat res;
-
-	dglNormalize3f(v1, nv1);
-	dglNormalize3f(v2, nv2);
-	res = (GLfloat) acos(dglDot3f(nv1,nv2));
-	free(nv1);
-	free(nv2);
-
-	return res;
+	return (GLfloat) acos(dglDot3f(v1,v2) / (dglMagnitude3f(v1) * dglMagnitude3f(v2)));
 }
 GLfloat dglGetRadians4f(GLfloat* v1, GLfloat* v2) {
-	GLfloat *nv1, *nv2;
-	GLfloat res;
-
-	dglNormalize4f(v1, nv1);
-	dglNormalize4f(v2, nv2);
-	res = (GLfloat) acos(dglDot4f(nv1,nv2));
-	free(nv1);
-	free(nv2);
-
-	return res;
+	return (GLfloat) acos(dglDot4f(v1,v2) / (dglMagnitude4f(v1) * dglMagnitude4f(v2)));
 }
 GLfloat dglGetDegrees3f(GLfloat* v1, GLfloat* v2) {
 	return dglGetDegrees3f(v1, v2) * 180 / DGL_PI;
@@ -107,48 +83,29 @@ GLfloat dglGetDegrees3f(GLfloat* v1, GLfloat* v2) {
 GLfloat dglGetDegrees4f(GLfloat* v1, GLfloat* v2) {
 	return dglGetDegrees4f(v1, v2) * 180 / DGL_PI;
 }
-
-
-
-GLfloat dglMagnitude3f(GLfloat* vec) {
-	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
-}
-GLfloat dglMagnitude4f(GLfloat* vec) {
-	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
-}
 void dglCopy3f(GLfloat* from, GLfloat* to) {
-	if(to == NULL)
-		to = (GLfloat*)malloc((sizeof from[0]) * 3);
 	to[0] = from[0];
 	to[1] = from[1];
 	to[2] = from[2];
 }
 void dglCopy4f(GLfloat* from, GLfloat* to) {
-	if(to == NULL)
-		to = (GLfloat*)malloc((sizeof from[0]) * 3);
 	to[0] = from[0];
 	to[1] = from[1];
 	to[2] = from[2];
 	to[3] = from[3];
 }
 void dglMultiply33f3f(GLfloat* A, GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat *)malloc((sizeof A[0]) * 3);
 	res[0] = A[0]*v[0]+A[3]*v[1]+A[6]*v[2];
 	res[1] = A[1]*v[0]+A[4]*v[1]+A[7]*v[2];
 	res[2] = A[2]*v[0]+A[5]*v[1]+A[8]*v[2];
 }
 void dglMultiply44f4f(GLfloat* A, GLfloat* v, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat*)malloc((sizeof A[0]) * 4);
 	res[0] = A[0]*v[0]+A[4]*v[1]+A[8]*v[2]+A[12]*v[3];
 	res[1] = A[1]*v[0]+A[5]*v[1]+A[9]*v[2]+A[13]*v[3];
 	res[2] = A[2]*v[0]+A[6]*v[1]+A[10]*v[2]+A[14]*v[3];
 	res[3] = A[3]*v[0]+A[7]*v[1]+A[11]*v[2]+A[15]*v[3];
 }
 void dglMultiply33f33f(GLfloat* A, GLfloat* B, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat*)malloc((sizeof A[0]) * 9);
 	res[0] = A[0]*B[0]+A[3]*B[1]+A[6]*B[2];
 	res[1] = A[1]*B[0]+A[4]*B[1]+A[7]*B[2];
 	res[2] = A[2]*B[0]+A[5]*B[1]+A[8]*B[2];
@@ -160,8 +117,6 @@ void dglMultiply33f33f(GLfloat* A, GLfloat* B, GLfloat* res) {
 	res[8] = A[2]*B[6]+A[5]*B[7]+A[8]*B[8];
 }
 void dglMultiply44f44f(GLfloat* A, GLfloat* B, GLfloat* res) {
-	if(res == NULL)
-		res = (GLfloat*)malloc((sizeof A[0]) * 16);
 	res[0] = A[0]*B[0]+A[4]*B[1]+A[8]*B[2]+A[12]*B[3];
 	res[1] = A[1]*B[0]+A[5]*B[1]+A[9]*B[2]+A[13]*B[3];
 	res[2] = A[2]*B[0]+A[6]*B[1]+A[10]*B[2]+A[14]*B[3];
@@ -178,4 +133,118 @@ void dglMultiply44f44f(GLfloat* A, GLfloat* B, GLfloat* res) {
 	res[13] = A[1]*B[12]+A[5]*B[13]+A[9]*B[14]+A[13]*B[15];
 	res[14] = A[2]*B[12]+A[6]*B[13]+A[10]*B[14]+A[14]*B[15];
 	res[15] = A[3]*B[12]+A[7]*B[13]+A[11]*B[14]+A[15]*B[15];
+}
+
+void dglReflect3f(GLfloat *r, GLfloat *n, GLfloat *res) {
+	GLfloat *tmp = malloc((sizeof r[0]) * 3);
+	dglScalar3f(2 * dglDot3f(r, n), n, tmp);
+	dglSubtract3f(r, tmp, res);
+	free(tmp);
+}
+
+void dglRefract3f(GLfloat *r, GLfloat *n, GLfloat eta, GLfloat *res) {
+	GLfloat *tmp1 = malloc((sizeof r[0]) * 3),
+		*tmp2 = malloc((sizeof r[0]) * 3);
+	GLfloat dot,k;
+	dot = dglDot3f(r,n);
+	k = 1 - eta*eta * (1 - (dot*dot));
+	if(k < 0) {
+		res[0] = 0;
+		res[1] = 0;
+		res[2] = 0;
+	} else {
+		dglScalar3f(eta, r, tmp1);
+		dglScalar3f(eta * dot + (GLfloat)sqrt(k), n, tmp2);
+	}
+	free(tmp1);
+	free(tmp2);
+}
+
+void dglIdentity22f(GLfloat *res) {
+	res[0] = 1;
+	res[1] = 0;
+	res[2] = 0;
+	res[3] = 1;
+}
+void dglIdentity33f(GLfloat *res) {
+	res[0] = 1;
+	res[1] = 0;
+	res[2] = 0;
+	res[3] = 0;
+	res[4] = 1;
+	res[5] = 0;
+	res[6] = 0;
+	res[7] = 0;
+	res[8] = 1;
+}
+void dglIdentity44f(GLfloat *res) {
+	res[0] = 1;
+	res[1] = 0;
+	res[2] = 0;
+	res[3] = 0;
+	res[4] = 0;
+	res[5] = 1;
+	res[6] = 0;
+	res[7] = 0;
+	res[8] = 0;
+	res[9] = 0;
+	res[10] = 1;
+	res[11] = 0;
+	res[12] = 0;
+	res[13] = 0;
+	res[14] = 0;
+	res[15] = 1;
+}
+
+void dglTranslate3f(GLfloat x, GLfloat y, GLfloat z, GLfloat *res) {
+	dglIdentity44f(res);
+	res[12] = x;
+	res[13] = y;
+	res[14] = z;
+}
+
+void dglRotateX(GLfloat phi, GLfloat *res) {
+	GLfloat cosPhi = (GLfloat)cos(phi),
+		sinPhi = (GLfloat)sin(phi);
+	dglIdentity44f(res);
+	res[5] = cosPhi;
+	res[6] = -sinPhi;
+	res[9] = sinPhi;
+	res[10] = cosPhi;
+}
+void dglRotateY(GLfloat theta, GLfloat *res) {
+	GLfloat cosTheta = (GLfloat)cos(theta),
+		sinTheta = (GLfloat)sin(theta);
+	dglIdentity44f(res);
+	res[0] = cosTheta;
+	res[2] = sinTheta;
+	res[8] = -sinTheta;
+	res[10] = cosTheta;
+}
+void dglRotateZ(GLfloat psi, GLfloat *res) {
+	GLfloat cosPsi = (GLfloat)cos(psi),
+		sinPsi = (GLfloat)sin(psi);
+	dglIdentity44f(res);
+	res[0] = cosPsi;
+	res[1] = sinPsi;
+	res[4] = -sinPsi;
+	res[5] = cosPsi;
+}
+void dglRotateXYZ(GLfloat phi, GLfloat theta, GLfloat psi, GLfloat *res) {
+	GLfloat cosPhi = (GLfloat)cos(phi),
+		sinPhi = (GLfloat)sin(phi),
+		cosTheta = (GLfloat)cos(theta),
+		sinTheta = (GLfloat)sin(theta),
+		cosPsi = (GLfloat)cos(psi),
+		sinPsi = (GLfloat)sin(psi);
+	dglIdentity44f(res);
+	res[0] = cosTheta*cosPsi;
+	res[1] = -cosTheta*sinPsi;
+	res[2] = sinTheta;
+	res[4] = cosPhi*sinPsi + sinPhi*sinTheta*cosPsi;
+	res[5] = cosPhi*cosPsi - sinPhi*sinTheta*sinPsi;
+	res[6] = -sinPhi*cosTheta;
+	res[8] = sinPhi*sinPsi - cosPhi*sinTheta*cosPsi;
+	res[9] = sinPhi*cosPsi + cosPhi*sinTheta*sinPsi;
+	res[10] = cosPhi*cosTheta;
 }
