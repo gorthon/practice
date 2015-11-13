@@ -267,7 +267,7 @@ void dglMultiplyQ(GLfloat *p, GLfloat *q, GLfloat *res) {
 	res[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]; // k
 }
 
-void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat) {}
+void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat *res) {}
 
 void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res) {
 	GLfloat *forward = malloc((sizeof eye[0])*3),
