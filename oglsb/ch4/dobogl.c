@@ -136,6 +136,10 @@ void dglMultiply44f44f(GLfloat* A, GLfloat* B, GLfloat* res) {
 }
 
 void dglReflect3f(GLfloat *r, GLfloat *n, GLfloat *res) {
+	// also works but confusing:
+	// dglScalar3f(2 * dglDot3f(r, n), n, res);
+	// dglSubtract3f(r, res, res);
+
 	GLfloat *tmp = malloc((sizeof r[0]) * 3);
 	dglScalar3f(2 * dglDot3f(r, n), n, tmp);
 	dglSubtract3f(r, tmp, res);
@@ -155,6 +159,7 @@ void dglRefract3f(GLfloat *r, GLfloat *n, GLfloat eta, GLfloat *res) {
 	} else {
 		dglScalar3f(eta, r, tmp1);
 		dglScalar3f(eta * dot + (GLfloat)sqrt(k), n, tmp2);
+		dglSubtract3f(tmp1, tmp2, res);
 	}
 	free(tmp1);
 	free(tmp2);
@@ -247,4 +252,46 @@ void dglRotateXYZ(GLfloat phi, GLfloat theta, GLfloat psi, GLfloat *res) {
 	res[8] = sinPhi*sinPsi - cosPhi*sinTheta*cosPsi;
 	res[9] = sinPhi*cosPsi + cosPhi*sinTheta*sinPsi;
 	res[10] = cosPhi*cosTheta;
+}
+void dglScale(GLfloat sx, GLfloat sy, GLfloat sz, GLfloat *res) {
+	dglIdentity44f(res);
+	res[0] = sx;
+	res[5] = sy;
+	res[10] = sz;
+}
+
+void dglMultiplyQ(GLfloat *p, GLfloat *q, GLfloat *res) {
+	res[0] = p[0]*q[0] - p[1]*q[1] - p[2]*q[2] - p[3]*q[3]; // s
+	res[1] = p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2]; // i
+	res[2] = p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1]; // j
+	res[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]; // k
+}
+
+void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat) {}
+
+void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res) {
+	GLfloat *forward = malloc((sizeof eye[0])*3),
+		*side = malloc((sizeof eye[0])*3),
+		*upOrthogonal = malloc((sizeof eye[0])*3),
+		*tmp = malloc((sizeof eye[0])*3);
+	dglSubtract3f(poi, eye, tmp);
+	dglNormalize3f(tmp, forward);
+	dglCross3f(forward, up, side);
+	dglCross3f(side, forward, upOrthogonal);
+	res[0] = side[0];
+	res[1] = side[1];
+	res[2] = side[2];
+	res[3] = 0;
+	res[4] = upOrthogonal[0];
+	res[5] = upOrthogonal[1];
+	res[6] = upOrthogonal[2];
+	res[7] = 0;
+	res[8] = forward[0];
+	res[9] = forward[1];
+	res[10] = forward[2];
+	res[11] = 0;
+	res[12] = -eye[0];
+	res[13] = -eye[1];
+	res[14] = -eye[2];
+	res[15] = 1;
 }
