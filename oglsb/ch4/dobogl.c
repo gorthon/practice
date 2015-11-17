@@ -44,7 +44,7 @@ GLfloat dglMagnitude3f(GLfloat* vec) {
 	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
 }
 GLfloat dglMagnitude4f(GLfloat* vec) {
-	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] + vec[3]*vec[3]);
 }
 void dglCross3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
 	res[0] = v1[1]*v2[2] - v1[2]*v2[1];
@@ -53,12 +53,58 @@ void dglCross3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
 }
 // void dglCross4f(GLfloat* v1, GLfloat* v2) {}
 
-// GLfloat dglDeterminant44f(GLfloat* A) {}
-GLfloat dglDeterminant33f(GLfloat* A) {
-	return A[0]*(A[4]*A[8]-A[5]*A[7]) - A[3]*(A[1]*A[8]-A[2]*A[7]) + A[6]*(A[1]*A[5]-A[2]*A[4]);
+// parameters appear as transpose of A here:
+GLfloat dglDeterminant4f(
+	GLfloat e00, GLfloat e10,
+	GLfloat e01, GLfloat e11) {
+	return e00*e11 - e01*e10;
+}
+GLfloat dglDeterminant9f(
+	GLfloat e00, GLfloat e10, GLfloat e20,
+	GLfloat e01, GLfloat e11, GLfloat e21,
+	GLfloat e02, GLfloat e12, GLfloat e22) {
+	return e00*dglDeterminant4f(
+			e11, e21,
+			e12, e22)
+		 - e01*dglDeterminant4f(
+		 	e10, e20,
+		 	e12, e22)
+		 + e02*dglDeterminant4f(
+		 	e10, e20,
+		 	e11, e21);
+}
+GLfloat dglDeterminant16f(
+	GLfloat e00, GLfloat e10, GLfloat e20, GLfloat e30,
+	GLfloat e01, GLfloat e11, GLfloat e21, GLfloat e31,
+	GLfloat e02, GLfloat e12, GLfloat e22, GLfloat e32,
+	GLfloat e03, GLfloat e13, GLfloat e23, GLfloat e33) {
+	return e00*dglDeterminant9f(
+			e11, e21, e31,
+			e12, e22, e32,
+			e13, e23, e33)
+		 - e01*dglDeterminant9f(
+		 	e10, e20, e30,
+		 	e12, e22, e32,
+		 	e13, e23, e33)
+		 + e02*dglDeterminant9f(
+		 	e10, e20, e30,
+		 	e11, e21, e31,
+		 	e13, e23, e33)
+		 - e03*dglDeterminant9f(
+		 	e10, e20, e30,
+		 	e11, e21, e31,
+		 	e12, e22, e32);
 }
 GLfloat dglDeterminant22f(GLfloat* A) {
-	return A[0]*A[3] - A[1]*A[2];
+	return dglDeterminant4f(A[0], A[1], A[2], A[3]);
+	// return A[0]*A[3] - A[1]*A[2];
+}
+GLfloat dglDeterminant33f(GLfloat* A) {
+	return dglDeterminant9f(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[8]);
+	// return A[0]*(A[4]*A[8]-A[5]*A[7]) - A[3]*(A[1]*A[8]-A[2]*A[7]) + A[6]*(A[1]*A[5]-A[2]*A[4]);
+}
+GLfloat dglDeterminant44f(GLfloat* A) {
+	return dglDeterminant16f(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[8], A[9], A[10], A[11], A[12], A[13], A[14], A[15]);
 }
 
 // GLfloat dgl3f(GLfloat* v1, GLfloat* v2) {}
@@ -265,6 +311,12 @@ void dglMultiplyQ(GLfloat *p, GLfloat *q, GLfloat *res) {
 	res[1] = p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2]; // i
 	res[2] = p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1]; // j
 	res[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]; // k
+}
+void dglAddQ(GLfloat *p, GLfloat *q, GLfloat *res) {
+	dglAdd4f(p, q, res);
+}
+void dglSubtractQ(GLfloat *p, GLfloat *q, GLfloat *res) {
+	dglSubtract4f(p, q, res);
 }
 
 void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat *res) {}
