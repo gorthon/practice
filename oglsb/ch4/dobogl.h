@@ -19,8 +19,8 @@ void dglSubtractQ(GLfloat *p, GLfloat *q, GLfloat *res);
 void dglScalar3f(GLfloat a, GLfloat* v, GLfloat* res);
 void dglScalar4f(GLfloat a, GLfloat* v, GLfloat* res);
 void dglScalarQ(GLfloat s, GLfloat *p, GLfloat *res);
-GLfloat dglMagnitude3f(GLfloat* vec);
-GLfloat dglMagnitude4f (GLfloat* vec);
+GLfloat dglMagnitude3f(GLfloat* v);
+GLfloat dglMagnitude4f (GLfloat* v);
 GLfloat dglNormQ(GLfloat *p);
 void dglNormalize3f(GLfloat* v, GLfloat* res);
 void dglNormalize4f(GLfloat* v, GLfloat* res);
@@ -30,6 +30,7 @@ GLfloat dglDot4f(GLfloat* v1, GLfloat* v2);
 void dglCross3f(GLfloat* v1, GLfloat* v2, GLfloat* res);
 void dglConjugateQ(GLfloat *p, GLfloat *res);
 void dglMultiplyQ(GLfloat *p, GLfloat *q, GLfloat *res);
+void dglReciprocalQ(GLfloat *p, GLfloat *res);
 
 GLfloat dglGetRadians3f(GLfloat* v1, GLfloat* v2);
 GLfloat dglGetRadians4f(GLfloat* v1, GLfloat* v2);

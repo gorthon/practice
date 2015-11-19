@@ -57,11 +57,17 @@ void dglScalar4f(GLfloat a, GLfloat* v, GLfloat* res) {
 void dglScalarQ(GLfloat s, GLfloat *p, GLfloat *res) {
 	dglScalar4f(s, p, res);
 }
-GLfloat dglMagnitude3f(GLfloat* vec) {
-	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+GLfloat dglDot3f(GLfloat* v1, GLfloat* v2) {
+	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
-GLfloat dglMagnitude4f (GLfloat* vec) {
-	return (GLfloat) sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] + vec[3]*vec[3]);
+GLfloat dglDot4f(GLfloat* v1, GLfloat* v2) {
+	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3];
+}
+GLfloat dglMagnitude3f(GLfloat* v) {
+	return (GLfloat) sqrt(dglDot3f(v,v));
+}
+GLfloat dglMagnitude4f (GLfloat* v) {
+	return (GLfloat) sqrt(dglDot4f(v,v));
 }
 GLfloat dglNormQ(GLfloat *p) {
 	return dglMagnitude4f(p);
@@ -74,12 +80,6 @@ void dglNormalize4f(GLfloat* v, GLfloat* res) {
 }
 void dglNormalizeQ(GLfloat *p, GLfloat *res) {
 	dglNormalize4f(p, res);
-}
-GLfloat dglDot3f(GLfloat* v1, GLfloat* v2) {
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
-}
-GLfloat dglDot4f(GLfloat* v1, GLfloat* v2) {
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3];
 }
 void dglCross3f(GLfloat* v1, GLfloat* v2, GLfloat* res) {
 	res[0] = v1[1]*v2[2] - v1[2]*v2[1];
@@ -97,6 +97,12 @@ void dglMultiplyQ(GLfloat *p, GLfloat *q, GLfloat *res) {
 	res[1] = p[0]*q[1] + p[1]*q[0] + p[2]*q[3] - p[3]*q[2]; // i
 	res[2] = p[0]*q[2] - p[1]*q[3] + p[2]*q[0] + p[3]*q[1]; // j
 	res[3] = p[0]*q[3] + p[1]*q[2] - p[2]*q[1] + p[3]*q[0]; // k
+}
+void dglReciprocalQ(GLfloat *p, GLfloat *res) {
+	GLfloat *tmp = malloc((sizeof p[0]) * 4);
+	dglConjugateQ(p, tmp);
+	dglScalarQ(1/dglDot4f(p,p), tmp, res);
+	free(tmp);
 }
 
 GLfloat dglGetRadians3f(GLfloat* v1, GLfloat* v2) {
@@ -328,7 +334,34 @@ void dglScale(GLfloat sx, GLfloat sy, GLfloat sz, GLfloat *res) {
 	res[10] = sz;
 }
 
-void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat *res) {}
+void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat *res) {
+	GLfloat *u = malloc((sizeof x)*3),
+		uMag, nx, ny, nz,
+		cosTheta = cos(theta),
+		sinTheta = sin(theta),
+		oneMinusCosTheta;
+	oneMinusCosTheta = 1 - cosTheta;
+	u[0] = x;
+	u[1] = y;
+	u[2] = z;
+	uMag = dglMagnitude3f(u);
+	nx = x / uMag;
+	ny = y / uMag;
+	nz = z / uMag;
+
+	dglIdentity44f(res);
+	res[0] = (1 - 2*nx*nx) * cosTheta;
+	res[1] = nx*ny*oneMinusCosTheta + nz*sinTheta;
+	res[2] = nx*nz*oneMinusCosTheta - ny*sinTheta;
+	res[4] = nx*ny*oneMinusCosTheta - nz*sinTheta;
+	res[5] = (1 - 2*ny*ny) * cosTheta;
+	res[6] = ny*nz*oneMinusCosTheta + nx*sinTheta;
+	res[8] = nx*nz*oneMinusCosTheta + ny*sinTheta;
+	res[9] = ny*nz*oneMinusCosTheta - nx*sinTheta;
+	res[10] = (1 - 2*nz*nz) * cosTheta;
+
+	free(u);
+}
 
 void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res) {
 	GLfloat *forward = malloc((sizeof eye[0])*3),
@@ -355,4 +388,12 @@ void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res) {
 	res[13] = -eye[1];
 	res[14] = -eye[2];
 	res[15] = 1;
+	free(forward);
+	free(side);
+	free(upOrthogonal);
+	free(tmp);
+}
+
+void dglFrustrum(GLfloat top, GLfloat right, GLfloat bottom, GLfloat left, GLfloat near, GLfloat far, GLfloat *res) {
+	
 }
