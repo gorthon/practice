@@ -395,5 +395,111 @@ void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res) {
 }
 
 void dglFrustrum(GLfloat top, GLfloat right, GLfloat bottom, GLfloat left, GLfloat near, GLfloat far, GLfloat *res) {
-	
+	dglIdentity44f(res);
+	res[0] = 2*near / (right-left);
+	res[5] = 2*near / (top-bottom);
+	res[8] = (right+left) / (right-left);
+	res[9] = (top+bottom) / (top-bottom);
+	res[10] = (near+far) / (near-far);
+	res[11] = -1;
+	res[14] = 2*near*far / (near-far);
+	res[15] = 0;
+}
+
+void dglPerspective(GLfloat fovy, GLfloat aspect, GLfloat near, GLfloat far, GLfloat *res) {
+
+}
+
+void dglOrthographic(GLfloat top, GLfloat right, GLfloat bottom, GLfloat left, GLfloat near, GLfloat far, GLfloat *res) {
+	dglIdentity44f(res);
+	res[0] = 2 / (right-left);
+	res[5] = 2 / (top-bottom);
+	res[10] = 2 / (near-far);
+	res[12] = (left+right) / (left-right);
+	res[13] = (bottom+top) / (bottom-top);
+	res[14] = (far+near) / (far-near);
+}
+
+void dglInterpolate3f(GLfloat *p1, GLfloat *p2, GLfloat t, GLfloat *res) {
+	res[0] = p1[0] + t*(p2[0]-p1[0]);
+	res[1] = p1[1] + t*(p2[1]-p1[1]);
+	res[2] = p1[2] + t*(p2[2]-p1[2]);
+}
+void dglInterpolate4f(GLfloat *p1, GLfloat *p2, GLfloat t, GLfloat *res) {
+	res[0] = p1[0] + t*(p2[0]-p1[0]);
+	res[1] = p1[1] + t*(p2[1]-p1[1]);
+	res[2] = p1[2] + t*(p2[2]-p1[2]);
+	res[3] = p1[3] + t*(p2[3]-p1[3]);
+}
+void dglQuadraticBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat t, GLfloat *res) {
+	GLfloat *p4 = mallc((sizeof p1[0])*3),
+		*p5 = mallc((sizeof p1[0])*3);
+	dglInterpolate3f(p1, p2, t, p4);
+	dglInterpolate3f(p2, p3, t, p5);
+	dglInterpolate3f(p4, p5, t, res);
+	free(p4);
+	free(p5);
+}
+void dglQuadraticBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat t, GLfloat *res) {
+	GLfloat *p4 = mallc((sizeof p1[0])*4),
+		*p5 = mallc((sizeof p1[0])*4);
+	dglInterpolate4f(p1, p2, t, p4);
+	dglInterpolate4f(p2, p3, t, p5);
+	dglInterpolate4f(p4, p5, t, res);
+	free(p4);
+	free(p5);
+}
+void dglCubicBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat t, GLfloat *res) {
+	GLfloat *p5 = mallc((sizeof p1[0])*3),
+		*p6 = mallc((sizeof p1[0])*3),
+		*p7 = mallc((sizeof p1[0])*3);
+	dglInterpolate3f(p1, p2, t, p5);
+	dglInterpolate3f(p2, p3, t, p6);
+	dglInterpolate3f(p3, p4, t, p7);
+	dglQuadraticBezier3f(p5, p6, p7, t, res);
+	free(p5);
+	free(p6);
+	free(p7);
+}
+void dglCubicBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat t, GLfloat *res) {
+	GLfloat *p5 = mallc((sizeof p1[0])*4),
+		*p6 = mallc((sizeof p1[0])*4),
+		*p7 = mallc((sizeof p1[0])*4);
+	dglInterpolate4f(p1, p2, t, p5);
+	dglInterpolate4f(p2, p3, t, p6);
+	dglInterpolate4f(p3, p4, t, p7);
+	dglQuadraticBezier4f(p5, p6, p7, t, res);
+	free(p5);
+	free(p6);
+	free(p7);
+}
+void dglQuarticBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat *p5, GLfloat t, GLfloat *res) {
+	GLfloat *p6 = mallc((sizeof p1[0])*3),
+		*p7 = mallc((sizeof p1[0])*3),
+		*p8 = mallc((sizeof p1[0])*3),
+		*p9 = mallc((sizeof p1[0])*3);
+	dglInterpolate3f(p1, p2, t, p6);
+	dglInterpolate3f(p2, p3, t, p7);
+	dglInterpolate3f(p3, p4, t, p8);
+	dglInterpolate3f(p4, p5, t, p9);
+	dglCubicBezier3f(p6, p7, p8, p9, t, res);
+	free(p6);
+	free(p7);
+	free(p8);
+	free(p9);
+}
+void dglQuarticBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat *p5, GLfloat t, GLfloat *res) {
+	GLfloat *p6 = mallc((sizeof p1[0])*4),
+		*p7 = mallc((sizeof p1[0])*4),
+		*p8 = mallc((sizeof p1[0])*4),
+		*p9 = mallc((sizeof p1[0])*4);
+	dglInterpolate4f(p1, p2, t, p6);
+	dglInterpolate4f(p2, p3, t, p7);
+	dglInterpolate4f(p3, p4, t, p8);
+	dglInterpolate4f(p4, p5, t, p9);
+	dglCubicBezier4f(p6, p7, p8, p9, t, res);
+	free(p6);
+	free(p7);
+	free(p8);
+	free(p9);
 }
