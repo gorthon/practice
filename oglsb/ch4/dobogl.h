@@ -64,6 +64,7 @@ void dglMultiply33f3f(GLfloat* A, GLfloat* v, GLfloat* res);
 void dglMultiply44f4f(GLfloat* A, GLfloat* v, GLfloat* res);
 void dglMultiply33f33f(GLfloat* A, GLfloat* B, GLfloat* res);
 void dglMultiply44f44f(GLfloat* A, GLfloat* B, GLfloat* res);
+
 void dglTranslate3f(GLfloat x, GLfloat y, GLfloat z, GLfloat *res);
 void dglRotateX(GLfloat phi, GLfloat *res);
 void dglRotateY(GLfloat theta, GLfloat *res);
@@ -72,5 +73,16 @@ void dglRotateXYZ(GLfloat phi, GLfloat theta, GLfloat psi, GLfloat *res);
 void dglScale(GLfloat sx, GLfloat sy, GLfloat sz, GLfloat *res);
 void dglRotateTR(GLfloat theta, GLfloat x, GLfloat y, GLfloat z, GLfloat *res);
 void dglLookat(GLfloat *eye, GLfloat *poi, GLfloat *up, GLfloat *res);
+void dglPerspective(GLfloat fovy, GLfloat aspect, GLfloat near, GLfloat far, GLfloat *res);
+void dglOrthographic(GLfloat top, GLfloat right, GLfloat bottom, GLfloat left, GLfloat near, GLfloat far, GLfloat *res);
+
+void dglInterpolate3f(GLfloat *p1, GLfloat *p2, GLfloat t, GLfloat *res);
+void dglInterpolate4f(GLfloat *p1, GLfloat *p2, GLfloat t, GLfloat *res);
+void dglQuadraticBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat t, GLfloat *res);
+void dglQuadraticBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat t, GLfloat *res);
+void dglCubicBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat t, GLfloat *res);
+void dglCubicBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat t, GLfloat *res);
+void dglQuarticBezier3f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat *p5, GLfloat t, GLfloat *res);
+void dglQuarticBezier4f(GLfloat *p1, GLfloat *p2, GLfloat *p3, GLfloat *p4, GLfloat *p5, GLfloat t, GLfloat *res);
 
 #endif
